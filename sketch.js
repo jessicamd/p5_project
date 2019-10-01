@@ -6,6 +6,8 @@ band = 250; //so board doesn't overlap with game pieces' starting position
 function setup(){
   frameRate(20);
   board = new Grid(0, 250);
+  c = color(255);
+  thickness = 6;
 
   x1 = new X();
   x2 = new X(150);
@@ -41,7 +43,9 @@ function setup(){
 
 function draw(){
   createCanvas(windowWidth, windowHeight); //fullwindow
-  background(255);
+  background(14, 59, 164);
+  stroke(c);
+  strokeWeight(thickness);
 
   board.display();
   board.xWin();
