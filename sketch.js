@@ -1,11 +1,10 @@
 gridSpeed = 5; //this is all for board
 xDirection = 1;
 yDirection = 1;
-band = 250; //so doesn't overlap with game pieces' starting position
+band = 250; //so board doesn't overlap with game pieces' starting position
 
 function setup(){
-  frameRate(20); //testing needed
-  //createCanvas(windowWidth, windowHeight); //fullwindow
+  frameRate(20);
   board = new Grid(0, 250);
 
   x1 = new X();
@@ -36,43 +35,46 @@ function setup(){
   qArray = [q0, q1, q2, q3, q4, q5, q6, q7, q8];
   iq = 0;
 
+  gridArray = [[q0, q1, q2], [q3, q4, q5], [q6, q7, q8]];
+
 }
 
 function draw(){
   createCanvas(windowWidth, windowHeight); //fullwindow
   background(255);
 
-  board.move();
   board.display();
+  board.xWin();
+  board.oWin();
 
   x1.display();
   x2.display();
   x3.display();
   x4.display();
   x5.display();
-  if(xArray !== undefined && xArray.length > 0){ //nothing to move if all objects are removed
-    xArray[ix].move();
-  }
+
   o1.display();
   o2.display();
   o3.display();
   o4.display();
   o5.display();
-  if(oArray !== undefined && oArray.length > 0){
-    oArray[io].move();
+
+  if(!board.xWin() && !board.oWin()){
+    board.move();
+    if(xArray[ix] !== undefined && xArray.length > 0){ //nothing to move if all objects are removed or array is undefined
+      xArray[ix].move();
+    }
+    if(oArray[io] !== undefined && oArray.length > 0){
+      oArray[io].move();
+    }
+  }else if(board.xWin()){
+    alert("X won!");
+    setup();
+  }else{
+    alert("O won!");
+    setup();
   }
 
-/**
-  q0.testQuadrant();
-  q1.testQuadrant();
-  q2.testQuadrant();
-  q3.testQuadrant();
-  q4.testQuadrant();
-  q5.testQuadrant();
-  q6.testQuadrant();
-  q7.testQuadrant();
-  q8.testQuadrant();
-  **/
 }
 
 class Grid{
@@ -111,7 +113,135 @@ class Grid{
     }
     this.x += gridSpeed * xDirection;
   }
+  xHorizontalWin(){
+    var i;
+    var k;
+    for(i = 0; i < gridArray.length; i++){
+      var count = 0;
+      for(k = 0; k < gridArray[i].length; k++){
+        if(gridArray[i][k].occupiedX){
+          count += 1;
+        }
+        if(count == gridArray.length){
+          return true;
+        }
+      }
+    }
+  }
+  xVerticalWin(){
+    var i;
+    var k;
+    for(i = 0; i < gridArray.length; i++){
+      var count = 0;
+      for(k = 0; k < gridArray[i].length; k++){
+        if(gridArray[k][i].occupiedX){
+          count += 1;
+        }
+        if(count == gridArray.length){
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  xDiagonalWin(){
+    var i;
+    var k;
+    for(i = 0, k = 0; i < gridArray.length; i++, k++){
+      var count = 0;
+        if(gridArray[k][i].occupiedX){
+          count += 1;
+        }
+        if(count == gridArray.length){
+          return true;
+        }
+    }
+    for(i = 0, k = gridArray.length -1; i < gridArray.length; i++, k--){
+      var count = 0;
+        if(gridArray[k][i].occupiedX){
+          count += 1;
+        }
+        if(count == gridArray.length){
+          return true;
+        }
+      }
+    return false;
+  }
+  xWin(){
+    if(this.xHorizontalWin() || this.xVerticalWin() || board.xDiagonalWin()){
+      console.log("x won!");
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+  oHorizontalWin(){
+    var i;
+    var k;
+    for(i = 0; i < gridArray.length; i++){
+      var count = 0;
+      for(k = 0; k < gridArray[i].length; k++){
+        if(gridArray[i][k].occupiedO){
+          count += 1;
+        }
+        if(count == gridArray.length){
+          return true;
+        }
+      }
+    }
+  }
+  oVerticalWin(){
+    var i;
+    var k;
+    for(i = 0; i < gridArray.length; i++){
+      var count = 0;
+      for(k = 0; k < gridArray[i].length; k++){
+        if(gridArray[k][i].occupiedO){
+          count += 1;
+        }
+        if(count == gridArray.length){
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  oDiagonalWin(){
+    var i;
+    var k;
+    for(i = 0, k = 0; i < gridArray.length; i++, k++){
+      var count = 0;
+        if(gridArray[k][i].occupiedO){
+          count += 1;
+        }
+        if(count == gridArray.length){
+          return true;
+        }
+    }
+    for(i = 0, k = gridArray.length -1; i < gridArray.length; i++, k--){
+      var count = 0;
+        if(gridArray[k][i].occupiedO){
+          count += 1;
+        }
+        if(count == gridArray.length){
+          return true;
+        }
+      }
+    return false;
+  }
+  oWin(){
+    if(this.oHorizontalWin() || this.oVerticalWin() || board.oDiagonalWin()){
+      console.log("o won!");
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+
 }
+
 
 class Quadrant{
   constructor(x, y){
@@ -129,6 +259,12 @@ class Quadrant{
     this.lowerY = board.y + 100*this.y;
     this.upperX = board.x + 100*(this.x + 1);
     this.upperY = board.y + 100*(this.y + 1);
+  }
+  xOccupied(){
+    return this.occupiedX;
+  }
+  oOccupied(){
+    return this.occupiedO;
   }
   xInQuadrant(piece){
     this.getPosition();
